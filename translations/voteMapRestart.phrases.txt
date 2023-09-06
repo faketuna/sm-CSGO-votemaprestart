@@ -1,0 +1,56 @@
+"Phrases"
+{
+    "vmr prefix"
+    {
+        "en"        "{lightgreen}[VMR]{default} "
+        "jp"        "{lightgreen}[VMR]{default} "
+    }
+    "vmr vote success"
+    {
+        "#format"   "{1:d}"
+        "en"        "Vote successful. Map will reload in {1} seconds."
+        "jp"        "投票が可決されました。 マップは後{1}秒でリロードされます。"
+    }
+    "vmr vote fail"
+    {
+        "en"        "Vote failed."
+        "jp"        "投票が否決されました。"
+    }
+    "vmr vote initiate"
+    {
+        "en"        "Initiated map reload vote."
+        "jp"        "マップリロード投票を開始しました。"
+    }
+    "vmr vote ask"
+    {
+        "en"        "Restart the current map?"
+        "jp"        "現在のマップをリロードしますか？"
+    }
+    "vmr cmd wants restart"
+    {
+        "#format"   "{1:s},{2:d},{3:d}"
+        "en"        "{1} wants the reload a map. Type !vmr in chat to vote. ({2}/{3})"
+        "jp"        "{1}がマップのリロードを希望しています。!vmrをチャットに入力して投票出来ます。 ({2}/{3})"
+    }
+    "vmr cmd already"
+    {
+        "#format"   "{1:d},{2:d}"
+        "en"        "You're already voted! ({1}/{2})"
+        "jp"        "すでに投票済みです。 ({1}/{2})"
+    }
+    "vmr cmd restarting"
+    {
+        "en"        "Map is reloading!"
+        "jp"        "マップのリロード中です！"
+    }
+    "vmr cmd only warmup"
+    {
+        "en"        "This command is only available durning wamrup round!"
+        "jp"        "このコマンドはウォームアップ中のみ使用できます！"
+    }
+    "vmr failed to fetch map name"
+    {
+        "en"        "{darkred}Error!!! Failed to get map name. Map will not be relaoded."
+        "jp"        "{darkred}エラー！ Map名の取得に失敗しました。そのためマップのリロードは行われません。"
+    }
+}
