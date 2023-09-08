@@ -48,6 +48,11 @@
         "en"        "This command is only available durning wamrup round!"
         "jp"        "このコマンドはウォームアップ中のみ使用できます！"
     }
+    "vmr cmd you can use now"
+    {
+        "en"        "You can use !vmr command for now. If map is incorrectly loaded, you can try reload map with this command."
+        "jp"        "現在 !vmr コマンドを使用できます！マップが正しくロードされていない場合等に使用してマップをリロードできます。"
+    }
     "vmr failed to fetch map name"
     {
         "en"        "{darkred}Error!!! Failed to get map name. Map will not be relaoded."

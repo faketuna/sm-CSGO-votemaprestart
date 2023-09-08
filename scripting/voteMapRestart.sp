@@ -12,6 +12,7 @@
 ConVar g_cPluginEnabled;
 ConVar g_cMapRestartTime;
 ConVar g_cVoteThreshold;
+ConVar g_cExecutionDisallowTime;
 
 bool g_bPluginEnabled;
 float g_fMapRestartTime = 5.0;
@@ -20,10 +21,11 @@ int g_iCurrentPlayer;
 int g_iVmrCmdVotes;
 int g_iRequiredPlayerNum;
 float g_fVoteThreshold;
+float g_fExecutionDisallowTime;
 
 bool votedPlayers[MAXPLAYERS+1];
 bool g_bIsRestarting;
-bool g_bIsWarmupRound;
+bool g_bExecutionAllowed;
 
 char g_sCurrentMap[128];
 
@@ -42,6 +44,7 @@ public void OnPluginStart() {
     g_cPluginEnabled        = CreateConVar("vmr_enabled", "1", "Enable Disable plugin", FCVAR_NOTIFY, true, 0.0, true, 1.0);
     g_cVoteThreshold        = CreateConVar("vmr_vote_threshold", "0.6", "How many votes requires in vote. (percent)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
     g_cMapRestartTime     = CreateConVar("vmr_map_restart_time", "5.0", "How long to take restarting round when vote passed.");
+    g_cExecutionDisallowTime     = CreateConVar("vmr_disallow_time", "60.0", "When elapsed specified time command will be disabled.");
 
     RegConsoleCmd("sm_vmr", CommandVMR, "");
 
@@ -49,6 +52,7 @@ public void OnPluginStart() {
     g_cPluginEnabled.AddChangeHook(OnCvarsChanged);
     g_cVoteThreshold.AddChangeHook(OnCvarsChanged);
     g_cMapRestartTime.AddChangeHook(OnCvarsChanged);
+    g_cExecutionDisallowTime.AddChangeHook(OnCvarsChanged);
 
     g_iCurrentPlayer = 0;
     for(int i = 1; i <= MaxClients; i++) {
@@ -57,6 +61,7 @@ public void OnPluginStart() {
         }
     }
     HookEvent("round_start", OnRoundStart, EventHookMode_Post);
+    HookEvent("player_spawn", OnPlayerSpawned, EventHookMode_Post);
 
     if(StrEqual(g_sCurrentMap, "")) {
         GetCurrentMap(g_sCurrentMap, sizeof(g_sCurrentMap));
@@ -69,7 +74,7 @@ public Action CommandVMR(int client, int agrs) {
         return Plugin_Handled;
     }
 
-    if (!g_bIsWarmupRound) {
+    if (!g_bExecutionAllowed) {
         CReplyToCommand(client, "%t%t", "vmr prefix", "vmr cmd only warmup");
         return Plugin_Handled;
     }
@@ -121,14 +126,35 @@ public Action OnRoundStart(Handle event, const char[] name, bool dontBroadcast) 
     return Plugin_Handled;
 }
 
+public void OnPlayerSpawned(Handle event, const char[] name, bool dontBroadcast) {
+    if(!g_bPluginEnabled) {
+        return;
+    }
+
+    int client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+    if(IsFakeClient(client)) {
+        return;
+    }
+    CPrintToChat(client, "%t%t", "vmr prefix", "vmr cmd you can use now");
+}
+
 public void OnMapStart() {
+    g_bExecutionAllowed = true;
+    CreateTimer(g_fExecutionDisallowTime, CommandDisallowTimer, _, TIMER_FLAG_NO_MAPCHANGE);
     GetCurrentMap(g_sCurrentMap, sizeof(g_sCurrentMap));
+}
+
+public Action CommandDisallowTimer(Handle timer) {
+    g_bExecutionAllowed = false;
+    return Plugin_Handled;
 }
 
 public void syncValues() {
     g_fMapRestartTime = g_cMapRestartTime.FloatValue;
     g_bPluginEnabled    = g_cPluginEnabled.BoolValue;
     g_fVoteThreshold    = g_cVoteThreshold.FloatValue;
+    g_fExecutionDisallowTime = g_cExecutionDisallowTime.FloatValue;
 }
 
 public void OnCvarsChanged(ConVar convar, const char[] oldValue, const char[] newValue) {
@@ -140,7 +166,6 @@ public void OnConfigsExecuted() {
 }
 
 public void Reset() {
-    g_bIsWarmupRound = view_as<bool>(GameRules_GetProp("m_bWarmupPeriod"));
     g_bIsRestarting = false;
     g_iVmrCmdVotes = 0;
     for(int i = 1; i <= MaxClients; i++) {
