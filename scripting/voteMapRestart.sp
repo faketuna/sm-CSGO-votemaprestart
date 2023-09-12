@@ -130,6 +130,9 @@ public void OnPlayerSpawned(Handle event, const char[] name, bool dontBroadcast)
     if(!g_bPluginEnabled) {
         return;
     }
+    if (!g_bExecutionAllowed) {
+        return;
+    }
 
     int client = GetClientOfUserId(GetEventInt(event, "userid"));
 
